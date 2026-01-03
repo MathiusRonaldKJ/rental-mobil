@@ -3,8 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Illuminate\Support\Facades\URL; // <--- 1. TAMBAHKAN INI
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,7 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // TRUST PROXY (WAJIB UNTUK RAILWAY)
+
+        // 2. PAKSA HTTPS JIKA DI PRODUCTION (RAILWAY)
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
+
+        // TRUST PROXY (SUDAH BENAR)
         $middleware->trustProxies(
             at: '*',
             headers:
@@ -22,11 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 SymfonyRequest::HEADER_X_FORWARDED_PORT |
                 SymfonyRequest::HEADER_X_FORWARDED_PROTO
         );
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })
     ->create();
-
-// FORCE HTTPS (PRODUCTION)
-URL::forceScheme('https');
