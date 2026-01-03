@@ -353,8 +353,8 @@
         
         <div class="login-body">
             {{-- ✅ FORM ACTION HTTPS --}}
-            <form method="POST" action="{{ url('/login') }}">
-                @csrf
+            <form method="POST" action="{{ secure_url('/login') }}">
+                                @csrf
                 
                 {{-- ... field email dan password ... --}}
                 

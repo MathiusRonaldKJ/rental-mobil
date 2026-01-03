@@ -393,8 +393,7 @@
         </div>
         
         <div class="register-body">
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
+        <form method="POST" action="{{ secure_url('/register') }}">                @csrf
                 
                 <div class="form-group-enhanced">
                     <label for="name" class="form-label-enhanced">
