@@ -3,8 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Illuminate\Support\Facades\URL; // <--- 1. TAMBAHKAN INI
+use Illuminate\Support\Facades\URL; // Wajib ada
+use Symfony\Component\HttpFoundation\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,25 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-
-        // 2. PAKSA HTTPS JIKA DI PRODUCTION (RAILWAY)
-        if (env('APP_ENV') === 'production') {
+    ->withMiddleware(function (Middleware $middleware) {
+        // Solusi Utama: Paksa HTTPS jika bukan di localhost
+        if (!app()->isLocal()) {
             URL::forceScheme('https');
         }
 
-        // TRUST PROXY (SUDAH BENAR)
-        $middleware->trustProxies(
-            at: '*',
-            headers:
-                SymfonyRequest::HEADER_X_FORWARDED_FOR |
-                SymfonyRequest::HEADER_X_FORWARDED_HOST |
-                SymfonyRequest::HEADER_X_FORWARDED_PORT |
-                SymfonyRequest::HEADER_X_FORWARDED_PROTO
-        );
-
+        // Percayakan Proxy Railway
+        $middleware->trustProxies(at: '*');
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
-    })
-    ->create();
+    })->create();
