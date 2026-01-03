@@ -356,7 +356,8 @@
         </div>
         
         <div class="login-body">
-            <form method="POST" action="{{ route('login') }}">
+            {{-- ✅ FIX HTTPS --}}
+            <form method="POST" action="/login">
                 @csrf
                 
                 <div class="form-group-enhanced">
@@ -411,11 +412,11 @@
                             Ingat saya
                         </label>
                     </div>
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="forgot-link">
-                            Lupa kata sandi?
-                        </a>
-                    @endif
+
+                    {{-- ✅ FIX HTTPS --}}
+                    <a href="/forgot-password" class="forgot-link">
+                        Lupa kata sandi?
+                    </a>
                 </div>
                 
                 <button type="submit" class="btn-login">
@@ -445,7 +446,9 @@
             
             <div class="register-link-container">
                 <p class="register-text">Belum memiliki akun?</p>
-                <a href="{{ route('register') }}" class="btn-register">
+
+                {{-- ✅ FIX HTTPS --}}
+                <a href="/register" class="btn-register">
                     <i class="bi bi-person-plus"></i>
                     <span>Daftar Akun Baru</span>
                 </a>
