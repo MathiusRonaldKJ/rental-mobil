@@ -661,7 +661,7 @@
                             <i class="bi bi-envelope me-2"></i> mkttransport.com
                         </a>
                         <a href="#">
-                            <i class="bi bi-geo-alt me-2"></i> Jl. Dekso-Plono, Puyang, Purwoharjo, Samigaluh< Kulon Progo
+                            <i class="bi bi-geo-alt me-2"></i> Jl. Dekso-Plono, Puyang, Purwoharjo, Samigaluh, Kulon Progo
                         </a>
                     </div>
                 </div>

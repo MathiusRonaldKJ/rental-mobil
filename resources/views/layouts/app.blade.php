@@ -416,137 +416,74 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-@stack('scripts')
-
-<script>
-    // Add animation to footer links
-    document.addEventListener('DOMContentLoaded', function() {
-        // ... existing code for footer links and scroll to top ...
-    });
-</script>
-
-<!-- ✅ ✅ ✅ TAMBAHKAN HTTPS FIX SCRIPT DI SINI ✅ ✅ ✅ -->
-<script>
-// ==================== HTTPS NUCLEAR ENFORCEMENT ====================
-(function() {
-    'use strict';
+    @stack('scripts')
     
-    console.log('🔒 Initializing HTTPS Enforcement System...');
-    
-    // 1. IMMEDIATE HTTP TO HTTPS REDIRECT
-    if (window.location.protocol === 'http:') {
-        console.warn('🚨 HTTP detected! Redirecting to HTTPS immediately...');
-        const httpsUrl = window.location.href.replace('http://', 'https://');
-        window.location.replace(httpsUrl);
-        return;
-    }
-    
-    // 2. FUNCTION TO FORCE HTTPS ON ANY URL
-    function enforceHttps(url) {
-        if (!url || typeof url !== 'string') return url;
-        return url.replace(/^http:\/\//i, 'https://');
-    }
-    
-    // 3. FIX ALL FORMS ON PAGE
-    function secureForms() {
-        const forms = document.querySelectorAll('form');
-        console.log(`🔧 Checking ${forms.length} forms for HTTPS...`);
-        
-        forms.forEach(form => {
-            // Fix form action
-            if (form.action && form.action.startsWith('http://')) {
-                console.log(`   Fixing form action: ${form.action}`);
-                form.action = enforceHttps(form.action);
-            }
+    <script>
+        // Add animation to footer links
+        document.addEventListener('DOMContentLoaded', function() {
+            const footerLinks = document.querySelectorAll('.footer-links a');
+            footerLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('i');
+                    icon.style.transform = 'translateX(3px)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('i');
+                    icon.style.transform = 'translateX(0)';
+                });
+            });
             
-            // Add submit protection if not already
-            if (!form.hasAttribute('data-https-secured')) {
-                form.setAttribute('data-https-secured', 'true');
-                
-                form.addEventListener('submit', function(event) {
-                    if (this.action && this.action.startsWith('http://')) {
-                        console.warn('⚠️ Blocked HTTP form submission!');
-                        event.preventDefault();
-                        this.action = enforceHttps(this.action);
-                        this.submit();
-                    }
+            // Add smooth scroll to top
+            const scrollToTopBtn = document.createElement('button');
+            scrollToTopBtn.innerHTML = '<i class="bi bi-chevron-up"></i>';
+            scrollToTopBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                background: #0d6efd;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+                transition: all 0.3s;
+            `;
+            
+            document.body.appendChild(scrollToTopBtn);
+            
+            scrollToTopBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 6px 20px rgba(13, 110, 253, 0.4)';
+            });
+            
+            scrollToTopBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(13, 110, 253, 0.3)';
+            });
+            
+            scrollToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
                 });
-            }
+            });
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.style.display = 'flex';
+                } else {
+                    scrollToTopBtn.style.display = 'none';
+                }
+            });
         });
-    }
-    
-    // 4. FIX ALL LINKS ON PAGE
-    function secureLinks() {
-        const links = document.querySelectorAll('a');
-        console.log(`🔗 Checking ${links.length} links for HTTPS...`);
-        
-        links.forEach(link => {
-            if (link.href && link.href.startsWith('http://')) {
-                console.log(`   Fixing link: ${link.href}`);
-                link.href = enforceHttps(link.href);
-                
-                // Add click protection
-                link.addEventListener('click', function(e) {
-                    if (this.href.startsWith('http://')) {
-                        e.preventDefault();
-                        window.location.href = enforceHttps(this.href);
-                    }
-                });
-            }
-        });
-    }
-    
-    // 5. INITIAL SECURITY CHECK ON PAGE LOAD
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 Page loaded, applying HTTPS enforcement...');
-        secureForms();
-        secureLinks();
-        
-        // Check current page URL
-        console.log(`📍 Current URL: ${window.location.href}`);
-        console.log(`🔐 Protocol: ${window.location.protocol}`);
-    });
-    
-    // 6. WATCH FOR DYNAMICALLY ADDED CONTENT (AJAX, MODALS, ETC)
-    const securityObserver = new MutationObserver(function(mutations) {
-        let shouldCheck = false;
-        
-        mutations.forEach(function(mutation) {
-            if (mutation.addedNodes.length > 0) {
-                shouldCheck = true;
-            }
-        });
-        
-        if (shouldCheck) {
-            setTimeout(function() {
-                console.log('🔄 Dynamic content detected, re-checking security...');
-                secureForms();
-                secureLinks();
-            }, 50);
-        }
-    });
-    
-    // Start security observer
-    securityObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-    
-    // 7. OVERRIDE BROWSER HISTORY API TO PREVENT HTTP PUSHSTATE
-    const originalPushState = history.pushState;
-    history.pushState = function(state, title, url) {
-        if (url && url.toString().startsWith('http://')) {
-            console.warn('🛡️ Blocked HTTP history.pushState');
-            url = enforceHttps(url.toString());
-        }
-        return originalPushState.call(this, state, title, url);
-    };
-    
-    console.log('✅ HTTPS Enforcement System fully activated');
-    
-})();
-// ==================== END HTTPS ENFORCEMENT ====================
-</script>
-
+    </script>
 </body>
 </html>
