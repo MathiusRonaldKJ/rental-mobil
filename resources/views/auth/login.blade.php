@@ -348,23 +348,73 @@
 <div class="login-container">
     <div class="login-card">
         <div class="login-header">
-            {{-- ... kode tetap ... --}}
+            <div class="login-icon">
+                <i class="bi bi-box-arrow-in-right"></i>
+            </div>
+            <h2 class="login-title">Selamat Datang Kembali</h2>
+            <p class="login-subtitle">Silakan masuk ke akun Anda untuk melanjutkan</p>
         </div>
         
         <div class="login-body">
-            {{-- ✅ FORM ACTION HTTPS --}}
+            {{-- ✅ FORM LOGIN SATU SAJA --}}
             <form method="POST" action="{{ secure_url('/login') }}">
-                                @csrf
+                @csrf
                 
-                {{-- ... field email dan password ... --}}
+                <div class="form-group-enhanced">
+                    <label for="email" class="form-label-enhanced">
+                        <i class="bi bi-envelope"></i> Alamat Email
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input type="email" 
+                               class="form-control-enhanced @error('email') is-invalid @enderror" 
+                               id="email" 
+                               name="email" 
+                               value="{{ old('email') }}" 
+                               required 
+                               autofocus
+                               placeholder="contoh@email.com">
+                    </div>
+                    @error('email')
+                        <div class="invalid-feedback d-block mt-2">
+                            <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label for="password" class="form-label-enhanced">
+                        <i class="bi bi-lock"></i> Kata Sandi
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" 
+                               class="form-control-enhanced @error('password') is-invalid @enderror" 
+                               id="password" 
+                               name="password" 
+                               required
+                               placeholder="Masukkan kata sandi">
+                    </div>
+                    @error('password')
+                        <div class="invalid-feedback d-block mt-2">
+                            <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
+                        </div>
+                    @enderror
+                </div>
                 
                 <div class="remember-forgot">
                     <div class="form-check-custom">
-                        {{-- ... checkbox ... --}}
+                        <input type="checkbox" 
+                               class="form-check-input-custom" 
+                               id="remember" 
+                               name="remember">
+                        <label class="form-check-label-custom" for="remember">
+                            Ingat saya
+                        </label>
                     </div>
 
                     {{-- ✅ FORGOT PASSWORD LINK HTTPS --}}
-                    <a href="{{ url('/forgot-password') }}" class="forgot-link">
+                    <a href="{{ secure_url('/forgot-password') }}" class="forgot-link">
                         Lupa kata sandi?
                     </a>
                 </div>
@@ -374,14 +424,31 @@
                     <span>Masuk ke Akun</span>
                 </button>
                 
-                {{-- ... divider dan features ... --}}
+                <div class="login-divider">
+                    <span>Atau</span>
+                </div>
+                
+                <div class="login-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="feature-text">Keamanan Terjamin</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <div class="feature-text">Proses Cepat</div>
+                    </div>
+                </div>
             </form>
             
             <div class="register-link-container">
                 <p class="register-text">Belum memiliki akun?</p>
 
                 {{-- ✅ REGISTER LINK HTTPS --}}
-                <a href="{{ url('/register') }}" class="btn-register">
+                <a href="{{ secure_url('/register') }}" class="btn-register">
                     <i class="bi bi-person-plus"></i>
                     <span>Daftar Akun Baru</span>
                 </a>
@@ -418,26 +485,28 @@
 
         // Toggle password visibility
         const passwordInput = document.getElementById('password');
-        const passwordToggle = document.createElement('span');
-        passwordToggle.innerHTML = '<i class="bi bi-eye"></i>';
-        passwordToggle.style.cssText = `
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6c757d;
-            font-size: 1.1rem;
-            z-index: 10;
-        `;
-        
-        passwordInput.parentNode.appendChild(passwordToggle);
-        
-        passwordToggle.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
-        });
+        if (passwordInput) {
+            const passwordToggle = document.createElement('span');
+            passwordToggle.innerHTML = '<i class="bi bi-eye"></i>';
+            passwordToggle.style.cssText = `
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                color: #6c757d;
+                font-size: 1.1rem;
+                z-index: 10;
+            `;
+            
+            passwordInput.parentNode.appendChild(passwordToggle);
+            
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+        }
 
         // Form validation animation
         const form = document.querySelector('form');
@@ -473,6 +542,20 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Debug: Cek semua URL
+        console.log('=== DEBUG HTTPS ===');
+        console.log('Form action:', document.querySelector('form').action);
+        console.log('Forgot link:', document.querySelector('.forgot-link').href);
+        console.log('Register link:', document.querySelector('.btn-register').href);
+        console.log('Current protocol:', window.location.protocol);
+        
+        // Auto-redirect HTTP ke HTTPS
+        if (window.location.protocol === 'http:') {
+            const httpsUrl = window.location.href.replace('http:', 'https:');
+            console.log('Redirecting to HTTPS:', httpsUrl);
+            window.location.href = httpsUrl;
+        }
     });
 </script>
 @endsection

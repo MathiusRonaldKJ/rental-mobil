@@ -393,7 +393,9 @@
         </div>
         
         <div class="register-body">
-        <form method="POST" action="{{ secure_url('/register') }}">                @csrf
+            {{-- ✅ FORM REGISTER YANG BENAR --}}
+            <form method="POST" action="{{ secure_url('/register') }}">
+                @csrf
                 
                 <div class="form-group-enhanced">
                     <label for="name" class="form-label-enhanced">
@@ -535,7 +537,8 @@
             
             <div class="login-link-container">
                 <p class="login-text">Sudah memiliki akun?</p>
-                <a href="{{ route('login') }}" class="btn-login">
+                {{-- ✅ PAKAI secure_url UNTUK LOGIN LINK --}}
+                <a href="{{ secure_url('/login') }}" class="btn-login">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Masuk ke Akun</span>
                 </a>
@@ -597,14 +600,16 @@
             });
         }
 
-        addPasswordToggle(passwordInput);
-        addPasswordToggle(confirmPasswordInput);
+        if (passwordInput) addPasswordToggle(passwordInput);
+        if (confirmPasswordInput) addPasswordToggle(confirmPasswordInput);
 
         // Password strength checker
         function checkPasswordStrength(password) {
             const strengthFill = document.getElementById('strengthFill');
             const strengthText = document.getElementById('strengthText');
             const passwordStrength = document.getElementById('passwordStrength');
+            
+            if (!strengthFill || !strengthText || !passwordStrength) return;
             
             let strength = 0;
             let messages = [];
@@ -661,60 +666,76 @@
         }
 
         // Password confirmation check
-        confirmPasswordInput.addEventListener('input', function() {
-            const passwordMatch = document.getElementById('passwordMatch');
-            const password = passwordInput.value;
-            const confirmPassword = this.value;
-            
-            if (confirmPassword.length === 0) {
-                passwordMatch.innerHTML = '';
-                return;
-            }
-            
-            if (password === confirmPassword) {
-                passwordMatch.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i> Kata sandi cocok</span>';
-            } else {
-                passwordMatch.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i> Kata sandi tidak cocok</span>';
-            }
-        });
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', function() {
+                const passwordMatch = document.getElementById('passwordMatch');
+                const password = passwordInput ? passwordInput.value : '';
+                const confirmPassword = this.value;
+                
+                if (!passwordMatch) return;
+                
+                if (confirmPassword.length === 0) {
+                    passwordMatch.innerHTML = '';
+                    return;
+                }
+                
+                if (password === confirmPassword) {
+                    passwordMatch.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i> Kata sandi cocok</span>';
+                } else {
+                    passwordMatch.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i> Kata sandi tidak cocok</span>';
+                }
+            });
+        }
 
         // Terms checkbox styling
         const termsCheckbox = document.getElementById('terms');
-        const termsLabel = document.querySelector('label[for="terms"]');
+        const termsContainer = document.querySelector('.terms-container');
         
-        termsCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                this.parentElement.parentElement.style.background = 'rgba(40, 167, 69, 0.15)';
-                this.parentElement.parentElement.style.borderColor = 'rgba(40, 167, 69, 0.3)';
-            } else {
-                this.parentElement.parentElement.style.background = 'var(--success-light)';
-                this.parentElement.parentElement.style.borderColor = 'rgba(40, 167, 69, 0.2)';
-            }
-        });
+        if (termsCheckbox && termsContainer) {
+            termsCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    termsContainer.style.background = 'rgba(40, 167, 69, 0.15)';
+                    termsContainer.style.borderColor = 'rgba(40, 167, 69, 0.3)';
+                } else {
+                    termsContainer.style.background = 'rgba(40, 167, 69, 0.1)';
+                    termsContainer.style.borderColor = 'rgba(40, 167, 69, 0.2)';
+                }
+            });
+        }
 
         // Form validation animation
         const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            const inputs = this.querySelectorAll('input[required]');
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const inputs = this.querySelectorAll('input[required]');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                        
+                        // Shake animation
+                        input.style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            input.style.animation = '';
+                        }, 500);
+                    }
+                });
+                
+                // Check password match
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('password_confirmation');
+                if (password && confirmPassword && password.value !== confirmPassword.value) {
                     isValid = false;
-                    input.classList.add('is-invalid');
-                    
-                    // Shake animation
-                    input.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        input.style.animation = '';
-                    }, 500);
+                    confirmPassword.classList.add('is-invalid');
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
                 }
             });
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
+        }
 
         // Add shake animation
         const style = document.createElement('style');
@@ -728,8 +749,21 @@
         document.head.appendChild(style);
 
         // Initialize password strength for existing value
-        if (passwordInput.value) {
+        if (passwordInput && passwordInput.value) {
             checkPasswordStrength(passwordInput.value);
+        }
+        
+        // Debug info
+        console.log('=== REGISTER FORM DEBUG ===');
+        console.log('Form action:', form ? form.action : 'Form not found');
+        console.log('Login link:', document.querySelector('.btn-login')?.href);
+        console.log('Current protocol:', window.location.protocol);
+        
+        // Auto-redirect HTTP ke HTTPS
+        if (window.location.protocol === 'http:') {
+            const httpsUrl = window.location.href.replace('http:', 'https:');
+            console.log('Redirecting to HTTPS:', httpsUrl);
+            window.location.href = httpsUrl;
         }
     });
 </script>
