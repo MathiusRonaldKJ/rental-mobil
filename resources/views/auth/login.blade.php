@@ -356,8 +356,8 @@
         </div>
         
         <div class="login-body">
-            {{-- ✅ FORM LOGIN SATU SAJA --}}
-            <form method="POST" action="{{ secure_url('/login') }}">
+            {{-- ✅ FORM DENGAN HTTPS HARDCORE --}}
+            <form method="POST" action="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/login">
                 @csrf
                 
                 <div class="form-group-enhanced">
@@ -413,8 +413,8 @@
                         </label>
                     </div>
 
-                    {{-- ✅ FORGOT PASSWORD LINK HTTPS --}}
-                    <a href="{{ secure_url('/forgot-password') }}" class="forgot-link">
+                    {{-- ✅ FORGOT PASSWORD LINK HTTPS HARDCORE --}}
+                    <a href="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/forgot-password" class="forgot-link">
                         Lupa kata sandi?
                     </a>
                 </div>
@@ -446,9 +446,8 @@
             
             <div class="register-link-container">
                 <p class="register-text">Belum memiliki akun?</p>
-
-                {{-- ✅ REGISTER LINK HTTPS --}}
-                <a href="{{ secure_url('/register') }}" class="btn-register">
+                {{-- ✅ REGISTER LINK HTTPS HARDCORE --}}
+                <a href="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/register" class="btn-register">
                     <i class="bi bi-person-plus"></i>
                     <span>Daftar Akun Baru</span>
                 </a>
@@ -510,27 +509,29 @@
 
         // Form validation animation
         const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            const inputs = this.querySelectorAll('input[required]');
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                    
-                    // Shake animation
-                    input.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        input.style.animation = '';
-                    }, 500);
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const inputs = this.querySelectorAll('input[required]');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                        
+                        // Shake animation
+                        input.style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            input.style.animation = '';
+                        }, 500);
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
                 }
             });
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
+        }
 
         // Add shake animation
         const style = document.createElement('style');
@@ -544,11 +545,9 @@
         document.head.appendChild(style);
         
         // Debug: Cek semua URL
-        console.log('=== DEBUG HTTPS ===');
-        console.log('Form action:', document.querySelector('form').action);
-        console.log('Forgot link:', document.querySelector('.forgot-link').href);
-        console.log('Register link:', document.querySelector('.btn-register').href);
-        console.log('Current protocol:', window.location.protocol);
+        console.log('=== HTTPS DEBUG ===');
+        console.log('Host:', '<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>');
+        console.log('Form action:', document.querySelector('form') ? document.querySelector('form').action : 'Form not found');
         
         // Auto-redirect HTTP ke HTTPS
         if (window.location.protocol === 'http:') {
@@ -556,6 +555,18 @@
             console.log('Redirecting to HTTPS:', httpsUrl);
             window.location.href = httpsUrl;
         }
-    });
+        
+        // Force semua link menjadi HTTPS
+        document.querySelectorAll('a, form').forEach(element => {
+            if (element.href && element.href.startsWith('http://')) {
+                console.warn('HTTP link found:', element.href);
+                element.href = element.href.replace('http:', 'https:');
+            }
+            if (element.action && element.action.startsWith('http://')) {
+                console.warn('HTTP form action found:', element.action);
+                element.action = element.action.replace('http:', 'https:');
+            }
+        });
+    }); // ✅ INI PENUTUP YANG BENAR UNTUK addEventListener
 </script>
 @endsection

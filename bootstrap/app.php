@@ -17,7 +17,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// ✅ SOLUSI PASTI: SETELAH APP DIBUAT
+// ✅ FORCE HTTPS SETELAH APP DIBUAT
 \Illuminate\Support\Facades\URL::forceScheme('https');
 
 return $app;

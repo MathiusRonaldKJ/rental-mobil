@@ -393,8 +393,8 @@
         </div>
         
         <div class="register-body">
-            {{-- ✅ FORM REGISTER YANG BENAR --}}
-            <form method="POST" action="{{ secure_url('/register') }}">
+            {{-- ✅ FORM REGISTER DENGAN HTTPS HARDCORE --}}
+            <form method="POST" action="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/register">
                 @csrf
                 
                 <div class="form-group-enhanced">
@@ -537,8 +537,8 @@
             
             <div class="login-link-container">
                 <p class="login-text">Sudah memiliki akun?</p>
-                {{-- ✅ PAKAI secure_url UNTUK LOGIN LINK --}}
-                <a href="{{ secure_url('/login') }}" class="btn-login">
+                {{-- ✅ LOGIN LINK DENGAN HTTPS HARDCORE --}}
+                <a href="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/login" class="btn-login">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Masuk ke Akun</span>
                 </a>
@@ -755,9 +755,22 @@
         
         // Debug info
         console.log('=== REGISTER FORM DEBUG ===');
+        console.log('Host:', '<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>');
         console.log('Form action:', form ? form.action : 'Form not found');
         console.log('Login link:', document.querySelector('.btn-login')?.href);
         console.log('Current protocol:', window.location.protocol);
+        
+        // ✅ FORCE SEMUA LINK MENJADI HTTPS
+        document.querySelectorAll('a, form').forEach(element => {
+            if (element.href && element.href.startsWith('http://')) {
+                console.log('Converting HTTP to HTTPS:', element.href);
+                element.href = element.href.replace('http:', 'https:');
+            }
+            if (element.action && element.action.startsWith('http://')) {
+                console.log('Converting form HTTP to HTTPS:', element.action);
+                element.action = element.action.replace('http:', 'https:');
+            }
+        });
         
         // Auto-redirect HTTP ke HTTPS
         if (window.location.protocol === 'http:') {
