@@ -357,8 +357,9 @@
         
         <div class="login-body">
             {{-- ✅ FORM DENGAN HTTPS HARDCORE --}}
-            <form method="POST" action="https://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/login">
-                @csrf
+            <form method="POST" action="https://<?php echo $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/login">
+    @csrf
+    {{-- ... --}}
                 
                 <div class="form-group-enhanced">
                     <label for="email" class="form-label-enhanced">
@@ -557,16 +558,20 @@
         }
         
         // Force semua link menjadi HTTPS
-        document.querySelectorAll('a, form').forEach(element => {
-            if (element.href && element.href.startsWith('http://')) {
-                console.warn('HTTP link found:', element.href);
-                element.href = element.href.replace('http:', 'https:');
-            }
-            if (element.action && element.action.startsWith('http://')) {
-                console.warn('HTTP form action found:', element.action);
-                element.action = element.action.replace('http:', 'https:');
+        document.querySelectorAll('form').forEach(form => {
+            if (form.action && !form.action.startsWith('https://')) {
+                form.action = form.action.replace('http://', 'https://');
             }
         });
-    }); // ✅ INI PENUTUP YANG BENAR UNTUK addEventListener
+        
+        // Force semua link ke HTTPS
+        document.querySelectorAll('a[href^="http://"]').forEach(link => {
+            link.href = link.href.replace('http://', 'https://');
+        });
+        
+        // Redirect jika masih HTTP
+        if (window.location.protocol === 'http:') {
+            window.location.href = window.location.href.replace('http:', 'https:');
+        }    }); // ✅ INI PENUTUP YANG BENAR UNTUK addEventListener
 </script>
 @endsection

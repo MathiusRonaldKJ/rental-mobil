@@ -12,12 +12,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+        $middleware->append(\App\Http\Middleware\ForceHttpsRailway::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
 
-// ✅ FORCE HTTPS SETELAH APP DIBUAT
+// ✅ FORCE HTTPS DI LEVEL TERTINGGI
 \Illuminate\Support\Facades\URL::forceScheme('https');
 
 return $app;
